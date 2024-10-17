@@ -29,3 +29,10 @@ include(FetchContent)
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::url)
 
+enable_testing()
+
+add_test(NAME mytest COMMAND ${CMAKE_COMMAND} -E echo "Passed this test")
+
+set_property(TEST mytest PROPERTY
+  PASS_REGULAR_EXPRESSION "pass;Passed"
+)

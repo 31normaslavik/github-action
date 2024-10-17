@@ -57,7 +57,7 @@ jobs:
     
     - name: Cache boost modules
       id: cache-boost
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       env:
         cache-name: cache-boost-modules
         build-dir: ${{ github.workspace }}/${{ matrix.os }}-build 
