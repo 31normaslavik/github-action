@@ -7,8 +7,10 @@ on:
   #  branches: [ "master" ]
   #pull_request:
   #  branches: [ "master" ]
-  workflow_dispatch
-  
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -99,27 +101,33 @@ jobs:
     
     - name: Calculate hash Ubuntu
       if: "${{ matrix.os == 'ubuntu-latest' }}"
+      shell: bash
       run: |
         cd ${{ github.workspace }}/${{ matrix.os }}-build
+        pwd
         sha256sum github-action > github-action.sha256sum
         cat github-action.sha256sum
     
     - name: Calculate hash Windows  
       if: "${{ matrix.os == 'windows-latest' }}"
+      shell: bash
       run: |
         cd ${{ github.workspace }}/${{ matrix.os }}-build
+        pwd
         ls Release
-        echo "${{ hashFiles('Release/github-action.exe') }} github-action.exe" > github-action.exe.sha256sum
+        sha256sum Release/github-action.exe > Release/github-action.exe.sha256sum
     
     - name: Calculate hash MacOS
       if: "${{ matrix.os == 'macos-latest' }}"
+      shell: bash
       run: |
         cd ${{ github.workspace }}/${{ matrix.os }}-build
+        pwd
         cat github-action > github-action_macos
         ls
-        echo "${{ hashFiles('github-action_macos') }} github-action_macos" > github-action.exe.sha256sum
+        sha256sum github-action_macos > github-action_macos.sha256sum
   
-
+  
     - name: Release
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
