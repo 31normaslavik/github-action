@@ -107,14 +107,14 @@ jobs:
       if: "${{ matrix.os == 'windows-latest' }}"
       run: |
         cd ${{ github.workspace }}/${{ matrix.os }}-build
-        sha256sum github-action.exe > github-action.exe.sha256sum
+        echo ${{ hashFiles('github-action.exe') }} > github-action.exe.sha256sum
     
     - name: Calculate hash MacOS
       if: "${{ matrix.os == 'macos-latest' }}"
       run: |
         cd ${{ github.workspace }}/${{ matrix.os }}-build
         cat github-action > github-action_macos
-        sha256sum github-action_macos > github-action_macos.sha256sum
+        echo ${{ hashFiles('github-action_macos') }} > github-action.exe.sha256sum
   
 
     - name: Release
