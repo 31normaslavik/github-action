@@ -107,6 +107,7 @@ jobs:
       if: "${{ matrix.os == 'windows-latest' }}"
       run: |
         cd ${{ github.workspace }}/${{ matrix.os }}-build
+        ls
         echo ${{ hashFiles('github-action.exe') }} > github-action.exe.sha256sum
     
     - name: Calculate hash MacOS
