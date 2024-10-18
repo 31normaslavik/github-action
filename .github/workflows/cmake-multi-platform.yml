@@ -99,35 +99,6 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
     
-    - name: Calculate hash Ubuntu
-      if: "${{ matrix.os == 'ubuntu-latest' }}"
-      shell: bash
-      run: |
-        cd ${{ github.workspace }}/${{ matrix.os }}-build
-        pwd
-        sha256sum github-action > github-action.sha256sum
-        cat github-action.sha256sum
-    
-    - name: Calculate hash Windows  
-      if: "${{ matrix.os == 'windows-latest' }}"
-      shell: bash
-      run: |
-        cd ${{ github.workspace }}/${{ matrix.os }}-build
-        pwd
-        ls Release
-        sha256sum Release/github-action.exe > Release/github-action.exe.sha256sum
-    
-    - name: Calculate hash MacOS
-      if: "${{ matrix.os == 'macos-latest' }}"
-      shell: bash
-      run: |
-        cd ${{ github.workspace }}/${{ matrix.os }}-build
-        pwd
-        cat github-action > github-action_macos
-        ls
-        sha256sum github-action_macos > github-action_macos.sha256sum
-  
-  
     - name: Release
       uses: softprops/action-gh-release@v2
       if: startsWith(github.ref, 'refs/tags/')
@@ -135,4 +106,12 @@ jobs:
         build-dir: ${{ github.workspace }}/${{ matrix.os }}-build
       with:
         files: |
-          ${{ env.build-dir }}/**github-action**
+          ${{ env.build-dir }}/github-action_linux
+          ${{ env.build-dir }}/github-action_linux.sha256sum
+          ${{ env.build-dir }}/github-action_linux.sha512sum
+          ${{ env.build-dir }}/github-action_darwin
+          ${{ env.build-dir }}/github-action_darwin.sha256sum
+          ${{ env.build-dir }}/github-action_darwin.sha512sum
+          ${{ env.build-dir }}/Release/github-action_win.exe
+          ${{ env.build-dir }}/Release/github-action_win.exe.sha256sum
+          ${{ env.build-dir }}/Release/github-action_win.exe.sha512sum
