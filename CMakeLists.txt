@@ -31,21 +31,21 @@ add_subdirectory(lib)
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE Boost::url mylib)
 
+message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
+
 add_custom_command(
   TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:.exe>> $<TARGET_FILE_DIR:${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:.exe>>/${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>
-
-  COMMAND ${CMAKE_COMMAND} -E chdir $<TARGET_FILE_DIR:${PROJECT_NAME}> 
-    sha256sum ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>.sha256sum
-  
-  COMMAND ${CMAKE_COMMAND} -E chdir $<TARGET_FILE_DIR:${PROJECT_NAME}> 
-    sha512sum ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>.sha512sum
+  COMMAND ${CMAKE_COMMAND} -E rename ${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:.exe> ${PROJECT_NAME}$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:.exe>
+  COMMAND ${CMAKE_COMMAND} -E sha256sum ${PROJECT_NAME}$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:.exe>.sha256sum
+  COMMAND ${CMAKE_COMMAND} -E sha512sum ${PROJECT_NAME}$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:.exe>.sha512sum
+  WORKING_DIRECTORY $<TARGET_FILE_DIR:${PROJECT_NAME}>
   VERBATIM)
   
 enable_testing()
-
-add_test(NAME mytest COMMAND ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe> -E echo "Passed this test")
-
+add_test(
+  NAME mytest 
+  COMMAND ${PROJECT_NAME}$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:.exe>
+  WORKING_DIRECTORY $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 set_property(TEST mytest PROPERTY
-  PASS_REGULAR_EXPRESSION "pass;Passed"
+  PASS_REGULAR_EXPRESSION "pass;Passed;foo()"
 )
