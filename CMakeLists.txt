@@ -33,15 +33,18 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Boost::url mylib)
 
 add_custom_command(
   TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:.exe>> $<TARGET_FILE_DIR:${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:.exe>>/${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>
+
   COMMAND ${CMAKE_COMMAND} -E chdir $<TARGET_FILE_DIR:${PROJECT_NAME}> 
-    sha256sum ${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:_win.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>.sha256sum
+    sha256sum ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>.sha256sum
+  
   COMMAND ${CMAKE_COMMAND} -E chdir $<TARGET_FILE_DIR:${PROJECT_NAME}> 
-    sha512sum ${PROJECT_NAME}$<$<PLATFORM_ID:Windows>:_win.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>.sha512sum
+    sha512sum ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe> > ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe>.sha512sum
   VERBATIM)
   
 enable_testing()
 
-add_test(NAME mytest COMMAND ${CMAKE_COMMAND} -E echo "Passed this test")
+add_test(NAME mytest COMMAND ${PROJECT_NAME}$<$<PLATFORM_ID:Linux>:_linux>$<$<PLATFORM_ID:Darwin>:_darwin>$<$<PLATFORM_ID:Windows>:_win.exe> -E echo "Passed this test")
 
 set_property(TEST mytest PROPERTY
   PASS_REGULAR_EXPRESSION "pass;Passed"
